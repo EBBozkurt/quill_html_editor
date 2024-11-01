@@ -7,6 +7,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:quill_html_editor/quill_html_editor.dart';
+import 'package:quill_html_editor/src/utils/custom_scroll.dart';
 import 'package:quill_html_editor/src/utils/hex_color.dart';
 import 'package:quill_html_editor/src/utils/string_util.dart';
 import 'package:quill_html_editor/src/widgets/edit_table_drop_down.dart';
@@ -197,33 +198,36 @@ class QuillHtmlEditorState extends State<QuillHtmlEditor> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: _loadScripts,
-        builder: (context, snap) {
-          if (snap.hasData) {
-            _quillJsScript = snap.data!;
-          }
-          if (snap.connectionState == ConnectionState.done) {
-            return LayoutBuilder(builder: (context, constraints) {
-              _initialContent = _getQuillPage(width: constraints.maxWidth);
-              return _buildEditorView(
-                  context: context, width: constraints.maxWidth);
-            });
-          }
+    return ScrollConfiguration(
+      behavior: CustomScrollBehavior(),
+      child: FutureBuilder(
+          future: _loadScripts,
+          builder: (context, snap) {
+            if (snap.hasData) {
+              _quillJsScript = snap.data!;
+            }
+            if (snap.connectionState == ConnectionState.done) {
+              return LayoutBuilder(builder: (context, constraints) {
+                _initialContent = _getQuillPage(width: constraints.maxWidth);
+                return _buildEditorView(
+                    context: context, width: constraints.maxWidth);
+              });
+            }
 
-          if (widget.loadingBuilder != null) {
-            return widget.loadingBuilder!(context);
-          } else {
-            return SizedBox(
-              height: widget.minHeight,
-              child: const Center(
-                child: CircularProgressIndicator(
-                  strokeWidth: 0.3,
+            if (widget.loadingBuilder != null) {
+              return widget.loadingBuilder!(context);
+            } else {
+              return SizedBox(
+                height: widget.minHeight,
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    strokeWidth: 0.3,
+                  ),
                 ),
-              ),
-            );
-          }
-        });
+              );
+            }
+          }),
+    );
   }
 
   Widget _buildEditorView(
@@ -409,6 +413,7 @@ class QuillHtmlEditorState extends State<QuillHtmlEditor> {
           },
           webSpecificParams: const WebSpecificParams(
             printDebugInfo: false,
+            webAllowFullscreenContent: true,
           ),
           mobileSpecificParams: MobileSpecificParams(
             androidEnableHybridComposition: true,
