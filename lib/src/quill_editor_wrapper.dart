@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:quill_html_editor/quill_html_editor.dart';
@@ -409,8 +410,13 @@ class QuillHtmlEditorState extends State<QuillHtmlEditor> {
           webSpecificParams: const WebSpecificParams(
             printDebugInfo: false,
           ),
-          mobileSpecificParams: const MobileSpecificParams(
+          mobileSpecificParams: MobileSpecificParams(
             androidEnableHybridComposition: true,
+            mobileGestureRecognizers: {
+              Factory<OneSequenceGestureRecognizer>(
+                () => EagerGestureRecognizer(),
+              ),
+            },
           ),
         ),
         Visibility(
